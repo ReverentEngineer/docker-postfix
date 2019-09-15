@@ -67,7 +67,7 @@ version = 3
 bind = yes
 bind_dn = $LDAP_DN
 bind_pw = $LDAP_DNPASS
-query_filter = (&(ObjectClass=dNSDomain)(dc=%s))
+query_filter = (&(objectClass=domainRelatedObject)(associatedDomain=%s))
 result_attribute = dc
 EOM
 
@@ -78,7 +78,7 @@ version = 3
 bind = yes
 bind_dn = $LDAP_DN
 bind_pw = $LDAP_DNPASS
-query_filter = (&(objectclass=inetOrgPerson)(uid=%s))
+query_filter = (&(objectClass=inetOrgPerson)(uid=%s))
 result_attribute = uid
 EOM
 
@@ -89,7 +89,7 @@ version = 3
 bind = yes
 bind_dn = $LDAP_DN
 bind_pw = $LDAP_DNPASS
-query_filter = (&(objectclass=inetOrgPerson)(mail=%s))
+query_filter = (&(objectClass=inetOrgPerson)(mail=%s))
 result_attribute = uid
 EOM
 
@@ -115,3 +115,5 @@ postconf -P "submission/inet/smtpd_sasl_auth_enable=yes"
 postconf -P "submission/inet/milter_macro_daemon_name=ORIGINATING"
 postconf -P 'submission/inet/smtpd_client_restrictions=permit_sasl_authenticated,$mua_client_restrictions'
 postconf -P "submission/inet/smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject"
+
+supervisord -n
