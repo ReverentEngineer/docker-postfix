@@ -116,4 +116,4 @@ postconf -P "submission/inet/milter_macro_daemon_name=ORIGINATING"
 postconf -P 'submission/inet/smtpd_client_restrictions=permit_sasl_authenticated,$mua_client_restrictions'
 postconf -P "submission/inet/smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject"
 
-supervisord -n
+postfix start-fg
