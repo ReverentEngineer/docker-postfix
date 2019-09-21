@@ -9,7 +9,7 @@ postconf -e "myhostname = $MAIL_HOSTNAME"
 postconf -e "mydestination = $MAIL_HOSTNAME"
 
 postconf -e "mua_client_restrictions = permit_mynetworks, reject_unauth_destination, reject_unknown_client_hostname, reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net, reject_rbl_client cbl.abuseat.org, permit"
-postcond -e 'smtpd_client_restrictions = $mua_client_restrctions'
+postconf -e 'smtpd_client_restrictions = $mua_client_restrctions'
 
 postconf -e "recipient_delimiter = +"
 
