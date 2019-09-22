@@ -106,6 +106,8 @@ fi
 postconf -M "submission/inet=submission   inet   n   -   n   -   -   smtpd"
 postconf -P "submission/inet/syslog_name=postfix/submission"
 postconf -P "submission/inet/smtpd_tls_security_level=encrypt"
+postconf -P "submission/inet/smtpd_tls_cert_file=$TLS_CERT"
+postconf -P "submission/inet/smtpd_tls_key_file=$TLS_KEY"
 postconf -P "submission/inet/smtpd_etrn_restrictions=reject"
 postconf -P "submission/inet/smtpd_sasl_type=dovecot"
 postconf -P "submission/inet/smtpd_sasl_path=inet:$DOVECOT_SASL_ADDR"
