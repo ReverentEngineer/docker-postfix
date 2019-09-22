@@ -9,7 +9,7 @@ postconf -e "myhostname = $MAIL_HOSTNAME"
 postconf -e "mydestination = $MAIL_HOSTNAME"
 
 postconf -e "mua_client_restrictions = permit_mynetworks, reject_unauth_destination, reject_unknown_client_hostname, reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net, reject_rbl_client cbl.abuseat.org, permit"
-postconf -e 'smtpd_client_restrictions = $mua_client_restrctions'
+postconf -e 'smtpd_client_restrictions = $mua_client_restrictions'
 
 postconf -e "recipient_delimiter = +"
 
@@ -60,7 +60,7 @@ if [[ -z $LDAP_DNPASS ]]; then
   exit 7
 fi
 
-cat << EOM > /etc/postfix/virtual_domains.cf"
+cat << EOM > /etc/postfix/virtual_domains.cf
 server_host = $LDAP_HOST
 search_base = $LDAP_BASE
 version = 3
@@ -103,7 +103,7 @@ if [[ -z $TLS_KEY ]]; then
   exit 9
 fi
 
-postconf -M submission/inet="submission   inet   n   -   n   -   -   smtpd"
+postconf -M "submission/inet=submission   inet   n   -   n   -   -   smtpd"
 postconf -P "submission/inet/syslog_name=postfix/submission"
 postconf -P "submission/inet/smtpd_tls_security_level=encrypt"
 postconf -P "submission/inet/smtpd_etrn_restrictions=reject"
