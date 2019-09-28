@@ -4,9 +4,16 @@ if [[ -z $MAIL_HOSTNAME ]]; then
   echo "No MAIL_HOSTNAME provided"
   exit 1
 fi
+
+if [[ -z $MAIL_DOMAIN ]]; then
+  echo "No MAIL_DOMAIN provided."
+  exit
+fi
   
+postconf -e "mydomain = $MAIL_DOMAIN"
 postconf -e "myhostname = $MAIL_HOSTNAME"  
-postconf -e "mydestination = $MAIL_HOSTNAME"
+postconf -e "mydestination = $MAIL_HOSTNAME, localhost.\$mydomain, localhost"
+postconf -e 'append_at_myorigin = yes'
 
 postconf -e "mua_client_restrictions = permit_mynetworks, reject_unauth_destination, reject_unknown_client_hostname, reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net, reject_rbl_client cbl.abuseat.org, permit"
 postconf -e 'smtpd_client_restrictions = $mua_client_restrictions'
@@ -34,7 +41,6 @@ fi
 
 if [[ ! -z $DOVECOT_LMTP_ADDR ]]; then
   postconf -e "virtual_transport = lmtp:inet:$DOVECOT_LMTP_ADDR"
-  postconf -e "mailbox_transport = lmtp:inet:$DOVECOT_LMTP_ADDR"
 else
   echo "No DOVECOT_LMTP_ADDR provided."
   exit 3
@@ -71,16 +77,6 @@ query_filter = (&(objectClass=domainRelatedObject)(associatedDomain=%s))
 result_attribute = dc
 EOM
 
-cat << EOM > /etc/postfix/virtual_mailboxes.cf
-server_host = $LDAP_HOST
-search_base = $LDAP_BASE
-version = 3
-bind = yes
-bind_dn = $LDAP_DN
-bind_pw = $LDAP_DNPASS
-query_filter = (&(objectClass=inetOrgPerson)(uid=%s))
-result_attribute = uid
-EOM
 
 cat << EOM > /etc/postfix/virtual_aliases.cf
 server_host = $LDAP_HOST
@@ -89,8 +85,11 @@ version = 3
 bind = yes
 bind_dn = $LDAP_DN
 bind_pw = $LDAP_DNPASS
-query_filter = (&(objectClass=inetOrgPerson)(mail=%s))
-result_attribute = uid
+query_filter = (mail=%s)
+result_filter = uid
+result_attribute = %s@${MAIL_DOMAIN}
+dereference = 3
+special_result_attribute = mailaliasmember
 EOM
 
 if [[ -z $TLS_CERT ]]; then
@@ -103,11 +102,29 @@ if [[ -z $TLS_KEY ]]; then
   exit 9
 fi
 
+postconf -e "virtual_mailbox_domains = ldap:/etc/postfix/virtual_domains.cf"
+postconf -e "virtual_alias_maps = ldap:/etc/postfix/virtual_aliases.cf"
+
+postconf -e "alias_maps = "
+postconf -e "alias_database = "
+
+if [[ ! -z $MAIL_ADMIN ]]; then
+  echo "Setting root alias to $MAIL_ADMIN";
+cat << EOM > /etc/alaises
+root: $MAIL_ADMIN
+EOM
+  postconf -e 'alias_maps = hash:/etc/aliases';
+  postconf -e 'alias_database = hash:/etc/aliases';
+  newaliases
+fi
+
+postconf -e "smtpd_tls_security_level=may"
+postconf -e "smtpd_tls_cert_file=$TLS_CERT"
+postconf -e "smtpd_tls_key_file=$TLS_KEY"
+
 postconf -M "submission/inet=submission   inet   n   -   n   -   -   smtpd"
 postconf -P "submission/inet/syslog_name=postfix/submission"
 postconf -P "submission/inet/smtpd_tls_security_level=encrypt"
-postconf -P "submission/inet/smtpd_tls_cert_file=$TLS_CERT"
-postconf -P "submission/inet/smtpd_tls_key_file=$TLS_KEY"
 postconf -P "submission/inet/smtpd_etrn_restrictions=reject"
 postconf -P "submission/inet/smtpd_sasl_type=dovecot"
 postconf -P "submission/inet/smtpd_sasl_path=inet:$DOVECOT_SASL_ADDR"
