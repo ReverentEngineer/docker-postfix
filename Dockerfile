@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:.310
 ENV MAIL_HOSTNAME mail.example.org
 ENV DOVECOT_SASL_ADDR dovecot:12345
 ENV DOVECOT_LMTP_ADDR dovecot:24

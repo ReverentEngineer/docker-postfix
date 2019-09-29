@@ -9,7 +9,8 @@ if [[ -z $MAIL_DOMAIN ]]; then
   echo "No MAIL_DOMAIN provided."
   exit
 fi
-  
+
+postconf -e "maillog_file = /dev/stdout"
 postconf -e "mydomain = $MAIL_DOMAIN"
 postconf -e "myhostname = $MAIL_HOSTNAME"  
 postconf -e "mydestination = $MAIL_HOSTNAME, localhost.\$mydomain, localhost"
