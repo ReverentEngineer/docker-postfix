@@ -87,9 +87,9 @@ bind = yes
 bind_dn = $LDAP_DN
 bind_pw = $LDAP_DNPASS
 query_filter = (mail=%s)
-result_filter = uid
-result_attribute = %s@${MAIL_DOMAIN}
+result_attribute = mail
 dereference = 3
+leaf_result_attribute = mail
 special_result_attribute = mailaliasmember
 EOM
 
