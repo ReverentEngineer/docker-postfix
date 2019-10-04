@@ -16,4 +16,4 @@ The image can be configured using the following bullets:
 * **LDAP_DN** - The LDAP DN to use for lookups
 * **LDAP_DNPASS** - The password for LDAP_DN
 * **TLS_CERT** - The location of the TLS certificate
-* **TLS_KEY** - The location of the TLSK certificate private key
+* **TLS_KEY** - The location of the TLS certificate private key
