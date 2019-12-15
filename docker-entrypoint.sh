@@ -41,7 +41,7 @@ else
 fi
 
 if [[ ! -z $DOVECOT_LMTP_ADDR ]]; then
-  postconf -e "virtual_transport = lmtp:inet:$DOVECOT_LMTP_ADDR"
+  postconf -e "local_transport = lmtp:inet:$DOVECOT_LMTP_ADDR"
 else
   echo "No DOVECOT_LMTP_ADDR provided."
   exit 3
